@@ -1,0 +1,37 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt pyinstaller
+
+      - name: Generate icon
+        run: python -c "from icon import create_icon; create_icon(256).save('pulse.ico', format='ICO', sizes=[(256,256),(128,128),(64,64),(48,48),(32,32),(16,16)])"
+
+      - name: Build exe
+        run: |
+          python -m PyInstaller --noconsole --onefile --icon=pulse.ico --collect-all customtkinter --collect-all pystray --name Pulse main.py
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/Pulse.exe
+          generate_release_notes: true

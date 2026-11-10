@@ -1,0 +1,6 @@
+pystray
+Pillow>=11.0.0
+psutil
+customtkinter
+WMI
+pywin32>=306
